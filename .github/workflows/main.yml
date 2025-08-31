@@ -56,11 +56,13 @@ jobs:
       - name: Code checkout
         uses: actions/checkout@v4
 
-      - name: Update application.properties file
+      - name: Sanitize secrets
         run: |
+         CLEAN_ENDPOINT=$(echo "${{ secrets.RDS_ENDPOINT }}" | tr -d '\n\r')
          sed -i "s|^jdbc.username.*$|jdbc.username=${{ secrets.RDS_USER }}|" src/main/resources/application.properties
          sed -i "s|^jdbc.password.*$|jdbc.password=${{ secrets.RDS_PASS }}|" src/main/resources/application.properties
-         sed -i "s|db01|${{ secrets.RDS_ENDPOINT }}|" src/main/resources/application.properties
+         sed -i "s|db01|$CLEAN_ENDPOINT|" src/main/resources/application.properties
+
 
 
       - name: Build & Upload image to ECR
